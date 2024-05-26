@@ -9,7 +9,8 @@ import { REALM_APP_ID } from '@env';
 import { StatusBar } from 'react-native';
 import { SignIn } from './src/screens/SignIn';
 import { Loading } from './src/components/Loading';
-import { Home } from './src/screens/Home';
+import { Routes } from './src/routes';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() {
     const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_700Bold })
@@ -22,18 +23,20 @@ export default function App() {
 
     return (
         <AppProvider id={REALM_APP_ID}>
-            <ThemeProvider theme={theme}>
-                <View style={{ flex: 1, backgroundColor: theme.COLORS.GRAY_800 }}>
-                    <StatusBar 
-                        barStyle="light-content" 
-                        backgroundColor="transparent" 
-                        translucent 
-                    />
-                    <UserProvider fallback={SignIn}>
-                        <Home />
-                    </UserProvider>
-                </View>
-            </ThemeProvider>
-        </AppProvider>
+                <ThemeProvider theme={theme}>
+                    <SafeAreaProvider>
+                        <View style={{ flex: 1, backgroundColor: theme.COLORS.GRAY_800 }}>
+                            <StatusBar 
+                                barStyle="light-content" 
+                                backgroundColor="transparent" 
+                                translucent 
+                            />
+                            <UserProvider fallback={SignIn}>
+                                <Routes />
+                            </UserProvider>
+                        </View>
+                    </SafeAreaProvider>
+                </ThemeProvider>
+            </AppProvider>
     )
 }
