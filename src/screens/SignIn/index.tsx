@@ -2,6 +2,8 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import { ANDROID_CLIENT_ID, IOS_CLIENT_ID } from '@env'
 
+import { Realm, useApp } from '@realm/react';
+
 import { useEffect, useState } from 'react';
 
 import { Container, Title, Slogan } from "./styles";
@@ -19,6 +21,8 @@ export function SignIn() {
         scopes: ['profile', 'email']
     })
 
+    const app = useApp();
+
     function handleGoogleSignIn() {
         setUseAuthenticating(true)
 
@@ -32,10 +36,12 @@ export function SignIn() {
     useEffect(() => {
         if (response?.type === 'success') {
             if (response.authentication?.idToken) {
+                const credentials = Realm.Credentials.jwt(response.authentication.idToken)
 
-                fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${response.authentication.idToken}`)
-                .then(response => response.json())
-                .then(response => console.log(response))
+                app.logIn(credentials).catch((error) => {
+                    Alert.alert('Erro', 'Falha ao autenticar. Tente novamente.')
+                    setUseAuthenticating(false)
+                })
 
             } else {
                 Alert.alert('Erro', 'Falha ao autenticar. Tente novamente.')
