@@ -1,3 +1,4 @@
+import 'react-native-get-random-values'
 import { View } from 'react-native';
 import { ThemeProvider } from 'styled-components/native'
 import theme from './src/theme';
@@ -11,6 +12,7 @@ import { SignIn } from './src/screens/SignIn';
 import { Loading } from './src/components/Loading';
 import { Routes } from './src/routes';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { RealmProvider } from './src/libs/realm';
 
 export default function App() {
     const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_700Bold })
@@ -24,7 +26,7 @@ export default function App() {
     return (
         <AppProvider id={REALM_APP_ID}>
                 <ThemeProvider theme={theme}>
-                    <SafeAreaProvider>
+                    <SafeAreaProvider style={{ flex: 1, backgroundColor: theme.COLORS.GRAY_800 }}>
                         <View style={{ flex: 1, backgroundColor: theme.COLORS.GRAY_800 }}>
                             <StatusBar 
                                 barStyle="light-content" 
@@ -32,7 +34,9 @@ export default function App() {
                                 translucent 
                             />
                             <UserProvider fallback={SignIn}>
-                                <Routes />
+                                <RealmProvider>
+                                    <Routes />
+                                </RealmProvider>
                             </UserProvider>
                         </View>
                     </SafeAreaProvider>

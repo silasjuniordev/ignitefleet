@@ -1,4 +1,5 @@
 import styled from "styled-components/native";
+import theme from "../../theme";
 
 export const Container = styled.TouchableOpacity`
     flex: 1;
@@ -18,7 +19,6 @@ export const Title = styled.Text`
     font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
 `;
 
-export const Loading = styled.ActivityIndicator
-    .attrs(({ theme }) => ({
-        color: theme.COLORS.WHITE
-    }))``;
+export const Loading = styled.ActivityIndicator.attrs(() => ({
+    color: theme.COLORS.WHITE
+}))``;
