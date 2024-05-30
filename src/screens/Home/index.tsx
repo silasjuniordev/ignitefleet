@@ -4,9 +4,10 @@ import { CarStatus } from '../../components/CarStatus';
 import { HomeHeader } from '../../components/HomeHeader';
 import { Container, Content } from './styles';
 
-import { useQuery } from '../../libs/realm';
+import { useQuery, useRealm } from '../../libs/realm';
 import { Historic } from '../../libs/realm/schemas/Historic';
 import { Alert } from 'react-native';
+import { HistoricCard } from '../../components/HistoricCard';
 
 
 
@@ -17,15 +18,17 @@ export function Home() {
 
   const historic = useQuery(Historic);
 
+  const realm = useRealm();
+
   function handleRegisterMovement() {
     if (vehicleInUse?._id) {
-      return navigate('arrival', { id: vehicleInUse?._id });
+      return navigate('arrival', { id: vehicleInUse?._id.toString() });
     } else {
       navigate('departure');
     }
   }
 
-  function fetchVehicle() {
+  function fetchVehicleInUse() {
     try {
         const vehicle = historic.filtered("status = 'departure'")[0]
         setVehicleInUse(vehicle);
@@ -35,9 +38,24 @@ export function Home() {
     }
   }
 
+  function fetchHistoric() {
+    const response = historic.filtered("status = 'arrival'").sorted("create_at", true)
+    console.log(response)
+  }
+
   useEffect(() => {
-    fetchVehicle();
+    fetchVehicleInUse()
+  })
+
+  useEffect(() => {
+    realm.addListener('change', () => fetchVehicleInUse())
+
+    return () => realm.removeListener('change', fetchVehicleInUse)
   }, [])
+
+  useEffect(() => {
+    fetchHistoric()
+  }, [historic])
 
   return (
     <Container>
@@ -47,6 +65,10 @@ export function Home() {
           <CarStatus 
             licensePlate={vehicleInUse?.license_plate}
             onPress={handleRegisterMovement} 
+        />
+
+        <HistoricCard 
+          data={{ created: '29-05-2024', licensePlate: 'NIX-6B22', isSync: false }}
         />
         </Content>
     </Container>

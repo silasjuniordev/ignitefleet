@@ -1,4 +1,4 @@
-import Realm  from 'realm';
+import Realm, { BSON }  from 'realm';
 
 type GenerateProps = {
     user_id: string;
@@ -12,12 +12,12 @@ export class Historic extends Realm.Object<Historic> {
     license_plate!: 'string';
     description!: 'string';
     status!: 'string';
-    create_at!: 'string';
-    update_at!: 'string';
+    create_at!: 'Date';
+    update_at!: 'Date';
 
     static generate({ user_id, license_plate, description }: GenerateProps) {
         return {
-            _id: new Realm.BSON.UUID(),
+            _id: new BSON.UUID(),
             user_id, 
             license_plate, 
             description,
