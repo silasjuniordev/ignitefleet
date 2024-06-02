@@ -1,13 +1,15 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { useObject, useRealm } from "../../libs/realm";
 import { Alert } from "react-native";
 import { BSON } from "realm";
-import { Container, Content, Description, Footer, Label, LicensePlate } from "./styles";
+import { AsyncMessage, Container, Content, Description, Footer, Label, LicensePlate } from "./styles";
 import { Header } from "../../components/Header";
 import { Button } from "../../components/Button";
 import { ButtonIcon } from "../../components/ButtonIcon";
 import { X } from "phosphor-react-native";
-import { useObject, useRealm } from "../../libs/realm";
 import { Historic } from "../../libs/realm/schemas/Historic";
+import { getLastAsyncTimestamp } from "../../libs/asyncStorage/syncStorage";
 
 type RouteParamsProps = {
     id: string
@@ -21,6 +23,10 @@ export function Arrival() {
     const realm = useRealm()
 
     const { goBack } = useNavigation()
+
+    const title = historic?.status === 'departure' ? 'Chegada' : 'Detalhes'
+
+    const [dataNotSync, setDataNotSync] = useState(false)
 
     function handleRemoveVehicle() {
         Alert.alert(
@@ -62,9 +68,14 @@ export function Arrival() {
         }
     }
 
+    useEffect(() => {
+        getLastAsyncTimestamp()
+        .then(lastSync => setDataNotSync(historic!.update_at.getTime() > lastSync))
+    }, [])
+
     return (
         <Container>
-            <Header title="Chegada" />
+            <Header title={title} />
 
             <Content>
                 <Label>
@@ -83,18 +94,30 @@ export function Arrival() {
                     {historic?.description}
                 </Description>
 
-                <Footer>
-                    <ButtonIcon 
-                        icon={X}
-                        onPress={handleRemoveVehicle}
-                    />
-
-                    <Button 
-                        title="Registrar Chegada" 
-                        onPress={handleArrivalVehicle}
-                    />
-                </Footer>
             </Content>
+            
+                {
+                    historic?.status === 'departure' && 
+                        <Footer>
+                            <ButtonIcon 
+                                icon={X}
+                                onPress={handleRemoveVehicle}
+                            />
+
+                            <Button 
+                                title="Registrar Chegada" 
+                                onPress={handleArrivalVehicle}
+                            />
+                        </Footer>
+                }
+
+                {
+                    dataNotSync &&
+                    <AsyncMessage>
+                        Sincronização da {historic?.status === 'departure' ? 'partida' : 'chegada'} pendente.
+                    </AsyncMessage>
+                }
+
         </Container>
     )
 }

@@ -4,6 +4,7 @@ import { Check, ClockClockwise } from "phosphor-react-native";
 import theme from "../../theme";
 
 export type HistoricCardProps = {
+    id: string
     licensePlate: string
     created: string  
     isSync: boolean
@@ -17,7 +18,7 @@ export function HistoricCard({ data, ...rest }: Props) {
     const { COLORS } = theme
 
     return (
-        <Container {...rest}>
+        <Container activeOpacity={0.7} {...rest}>
             <Info>
                 <LicensePlate>
                     {data.licensePlate}
